@@ -1,3 +1,4 @@
+"use client";
 import { lusitana } from "@/app/ui/fonts";
 import {
   AtSymbolIcon,
@@ -6,10 +7,24 @@ import {
 } from "@heroicons/react/24/outline";
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
 import { Button } from "./button";
+import { authenticate } from "../lib/actions";
+import { useState } from "react";
 
 export default function LoginForm() {
+  const [errorMessage, setErrorMessage] = useState("");
+  const formAction = async (formData: FormData) => {
+    try {
+      const error = await authenticate(undefined, formData);
+      if (error) {
+        setErrorMessage(error);
+      }
+    } catch (e) {
+      setErrorMessage("Unknow error");
+    }
+  };
+
   return (
-    <form className="space-y-3">
+    <form className="space-y-3" action={formAction}>
       <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
         <h1 className={`${lusitana.className} mb-3 text-2xl`}>
           Please log in to continue.
@@ -60,6 +75,12 @@ export default function LoginForm() {
         </Button>
         <div className="flex h-8 items-end space-x-1">
           {/* Add form errors here */}
+          {errorMessage && (
+            <>
+              <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
+              <p className="text-sm text-red-500">{errorMessage}</p>
+            </>
+          )}
         </div>
       </div>
     </form>
